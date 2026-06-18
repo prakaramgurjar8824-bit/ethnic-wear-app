@@ -1,0 +1,32 @@
+{% extends 'admin/base.html' %}
+{% block title %}Categories{% endblock %}
+{% block page_title %}Categories{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+  <a href="{{ url_for('add_category') }}" class="btn btn-saffron"><i class="bi bi-plus me-1"></i>Add Category</a>
+</div>
+
+<div class="bg-white rounded-3 border overflow-hidden">
+  <table class="table table-hover mb-0">
+    <thead style="background:#faf6f0">
+      <tr><th>Name</th><th>Products</th><th>Order</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for cat in cats %}
+      <tr>
+        <td class="fw-500">{{ cat.name }}</td>
+        <td><span class="badge" style="background:#fff3e8;color:#D4601A">{{ cat.products|length }}</span></td>
+        <td>{{ cat.order_num }}</td>
+        <td>
+          <a href="{{ url_for('edit_category', id=cat.id) }}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+          <a href="{{ url_for('delete_category', id=cat.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this category?')">Delete</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-muted py-4">No categories yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

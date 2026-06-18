@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}EthniCraft{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --saffron: #D4601A;
+      --deep: #1A0A00;
+      --cream: #FDF6EC;
+      --gold: #C9A84C;
+      --muted: #7A6652;
+    }
+    body { font-family: 'Inter', sans-serif; background: #fff; color: var(--deep); }
+    .navbar { background: var(--deep) !important; border-bottom: 2px solid var(--gold); }
+    .navbar-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold) !important; }
+    .nav-link { color: #e8d8c0 !important; font-size: 0.88rem; text-transform: uppercase; }
+    .nav-link:hover { color: var(--gold) !important; }
+    .btn-saffron { background: var(--saffron); color: #fff; border: none; }
+    .btn-saffron:hover { background: #b84e12; color: #fff; }
+    footer { background: var(--deep); color: #b8a090; padding: 3rem 0 1.5rem; }
+    footer h6 { color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 1rem; }
+    footer a { color: #b8a090; text-decoration: none; display: block; margin-bottom: .4rem; font-size: .88rem; }
+    footer a:hover { color: var(--gold); }
+    .footer-bottom { border-top: 1px solid #3a2a1a; margin-top: 2rem; padding-top: 1.2rem; font-size: .8rem; text-align: center; }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">✦ EthniCraft</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon" style="filter:invert(1)"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto gap-2">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+        {% for cat in categories %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('category', cat_id=cat.id) }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-2">
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} alert-dismissible fade show py-2">
+          {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <h6>✦ EthniCraft</h6>
+        <p style="font-size:.88rem">Celebrating traditional fashion. Handpicked ethnic wear for every occasion.</p>
+      </div>
+      <div class="col-md-2 mb-4">
+        <h6>Shop</h6>
+        <a href="#">Men</a>
+        <a href="#">Women</a>
+        <a href="#">Kids</a>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h6>Help</h6>
+        <a href="#">Size Guide</a>
+        <a href="#">Shipping & Returns</a>
+        <a href="#">Contact Us</a>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h6>Follow Us</h6>
+        <div class="d-flex gap-3 fs-4">
+          <a href="https://www.instagram.com/pachojaipur/?hl=en"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-pinterest"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 EthniCraft. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

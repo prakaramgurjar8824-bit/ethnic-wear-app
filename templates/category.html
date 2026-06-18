@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}{{ cat.name }} – EthniCraft{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-banner { background: linear-gradient(135deg, var(--deep), #3D1A00); padding: 4rem 0; color: #fff; }
+  .page-banner h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; }
+  .prod-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; transition: box-shadow .25s; }
+  .prod-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+  .prod-img-wrap { height: 240px; background: var(--cream); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .prod-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .prod-img-placeholder { font-size: 3.5rem; color: var(--muted); }
+  .prod-name { font-family: 'Playfair Display', serif; font-size: 1rem; }
+  .prod-price { color: var(--saffron); font-weight: 600; font-size: 1.05rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb" style="--bs-breadcrumb-divider-color:#c9a84c">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}" style="color:var(--gold)">Home</a></li>
+        <li class="breadcrumb-item active text-white">{{ cat.name }}</li>
+      </ol>
+    </nav>
+    <h1>{{ cat.name }}'s Collection</h1>
+    <p style="color:#e8d8c0">{{ products|length }} products</p>
+  </div>
+</div>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="prod-card h-100">
+          <div class="prod-img-wrap">
+            {% if product.image %}
+            <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" onerror="this.parentElement.innerHTML='<div class=prod-img-placeholder>👗</div>'">
+            {% else %}
+            <div class="prod-img-placeholder">👗</div>
+            {% endif %}
+          </div>
+          <div class="card-body p-3">
+            <div class="prod-name mb-1">{{ product.name }}</div>
+            <div class="prod-price">₹{{ "%.0f"|format(product.price) }}</div>
+            {% if product.description %}
+            <p class="text-muted mt-1" style="font-size:.82rem">{{ product.description[:80] }}{% if product.description|length > 80 %}…{% endif %}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-center py-5">
+        <div style="font-size:3rem">🛍️</div>
+        <p class="text-muted mt-2">No products in this category yet.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-saffron">Back to Home</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

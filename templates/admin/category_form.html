@@ -1,0 +1,22 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ 'Edit' if cat else 'Add' }} Category{% endblock %}
+{% block page_title %}{{ 'Edit' if cat else 'Add' }} Category{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-3 border p-4" style="max-width:400px">
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label fw-500">Category Name</label>
+      <input type="text" class="form-control" name="name" value="{{ cat.name if cat else '' }}" placeholder="e.g. Men, Women, Kids" required>
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-500">Display Order</label>
+      <input type="number" class="form-control" name="order_num" value="{{ cat.order_num if cat else 0 }}" min="0">
+    </div>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-saffron px-4">Save Category</button>
+      <a href="{{ url_for('admin_categories') }}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

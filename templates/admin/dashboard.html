@@ -1,0 +1,53 @@
+{% extends 'admin/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="bg-white rounded-3 border p-4">
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:2.5rem">🖼️</div>
+        <div>
+          <div style="font-size:2rem;font-weight:700">{{ slider_count }}</div>
+          <div class="text-muted">Sliders</div>
+        </div>
+      </div>
+      <a href="{{ url_for('admin_sliders') }}" class="btn btn-saffron btn-sm mt-3 w-100">Manage Sliders</a>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="bg-white rounded-3 border p-4">
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:2.5rem">🏷️</div>
+        <div>
+          <div style="font-size:2rem;font-weight:700">{{ cat_count }}</div>
+          <div class="text-muted">Categories</div>
+        </div>
+      </div>
+      <a href="{{ url_for('admin_categories') }}" class="btn btn-saffron btn-sm mt-3 w-100">Manage Categories</a>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="bg-white rounded-3 border p-4">
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:2.5rem">👗</div>
+        <div>
+          <div style="font-size:2rem;font-weight:700">{{ prod_count }}</div>
+          <div class="text-muted">Products</div>
+        </div>
+      </div>
+      <a href="{{ url_for('admin_products') }}" class="btn btn-saffron btn-sm mt-3 w-100">Manage Products</a>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-3 border p-4" style="max-width:400px">
+  <h6 style="font-family:'Playfair Display',serif;margin-bottom:1rem">Quick Actions</h6>
+  <div class="d-flex flex-column gap-2">
+    <a href="{{ url_for('add_slider') }}" class="btn btn-outline-secondary btn-sm text-start"><i class="bi bi-plus me-2"></i>Add Slider</a>
+    <a href="{{ url_for('add_category') }}" class="btn btn-outline-secondary btn-sm text-start"><i class="bi bi-plus me-2"></i>Add Category</a>
+    <a href="{{ url_for('add_product') }}" class="btn btn-saffron btn-sm text-start"><i class="bi bi-plus me-2"></i>Add Product</a>
+  </div>
+</div>
+{% endblock %}

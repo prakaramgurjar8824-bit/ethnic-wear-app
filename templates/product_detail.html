@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} – EthniCraft{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-banner { background: linear-gradient(135deg, var(--deep), #3D1A00); padding: 2.5rem 0; color: #fff; }
+  .detail-img-wrap { background: var(--cream); border-radius: 12px; overflow: hidden; height: 480px; display: flex; align-items: center; justify-content: center; }
+  .detail-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .detail-img-placeholder { font-size: 6rem; color: var(--muted); }
+  .detail-name { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep); }
+  .detail-price { color: var(--saffron); font-weight: 700; font-size: 1.6rem; }
+  .detail-desc { color: #555; line-height: 1.7; margin: 1.2rem 0; }
+  .btn-saffron-lg { background: var(--saffron); color: #fff; border: none; padding: .8rem 2rem; border-radius: 8px; font-weight: 500; }
+  .btn-saffron-lg:hover { background: #b84e12; color: #fff; }
+  .related-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; transition: box-shadow .25s; }
+  .related-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+  .related-img-wrap { height: 180px; background: var(--cream); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .related-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0" style="--bs-breadcrumb-divider-color:#c9a84c">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}" style="color:var(--gold)">Home</a></li>
+        {% if product.category %}
+        <li class="breadcrumb-item"><a href="{{ url_for('category', cat_id=product.category.id) }}" style="color:var(--gold)">{{ product.category.name }}</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active text-white">{{ product.name }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-md-6">
+        <div class="detail-img-wrap">
+          {% if product.image %}
+          <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" onerror="this.parentElement.innerHTML='<div class=detail-img-placeholder>👗</div>'">
+          {% else %}
+          <div class="detail-img-placeholder">👗</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        {% if product.category %}
+        <span class="badge mb-2" style="background:var(--cream);color:var(--muted);border:1px solid #ddd">{{ product.category.name }}</span>
+        {% endif %}
+        <h1 class="detail-name">{{ product.name }}</h1>
+        <div class="detail-price">₹{{ "%.0f"|format(product.price) }}</div>
+        {% if product.description %}
+        <p class="detail-desc">{{ product.description }}</p>
+        {% else %}
+        <p class="detail-desc text-muted">No description available.</p>
+        {% endif %}
+        <button class="btn-saffron-lg">Add to Cart</button>
+        <a href="{{ url_for('index') if not product.category else url_for('category', cat_id=product.category.id) }}" class="btn btn-outline-secondary ms-2 py-2">Back</a>
+      </div>
+    </div>
+
+    {% if related %}
+    <div class="mt-5 pt-4 border-top">
+      <h4 class="mb-4" style="font-family:'Playfair Display',serif">You may also like</h4>
+      <div class="row g-4">
+        {% for r in related %}
+        <div class="col-6 col-md-3">
+          <a href="{{ url_for('product_detail', id=r.id) }}" class="text-decoration-none">
+            <div class="related-card h-100">
+              <div class="related-img-wrap">
+                {% if r.image %}
+                <img src="{{ url_for('static', filename=r.image) }}" alt="{{ r.name }}" onerror="this.parentElement.innerHTML='<div class=detail-img-placeholder style=font-size:2.5rem>👗</div>'">
+                {% else %}
+                <div class="detail-img-placeholder" style="font-size:2.5rem">👗</div>
+                {% endif %}
+              </div>
+              <div class="card-body p-2">
+                <div style="font-family:'Playfair Display',serif;font-size:.9rem;color:var(--deep)">{{ r.name }}</div>
+                <div style="color:var(--saffron);font-weight:600">₹{{ "%.0f"|format(r.price) }}</div>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

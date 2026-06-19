@@ -17,8 +17,8 @@
     }
     body { font-family: 'Inter', sans-serif; background: #fff; color: var(--deep); }
     .navbar { background: var(--deep) !important; border-bottom: 2px solid var(--gold); }
-    .navbar-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold) !important; }
-    .nav-link { color: #e8d8c0 !important; font-size: 0.88rem; text-transform: uppercase; }
+    .navbar-brand { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold) !important; letter-spacing: 1px; }
+    .nav-link { color: #e8d8c0 !important; font-size: 0.88rem; letter-spacing: 0.5px; text-transform: uppercase; transition: color .2s; }
     .nav-link:hover { color: var(--gold) !important; }
     .btn-saffron { background: var(--saffron); color: #fff; border: none; }
     .btn-saffron:hover { background: #b84e12; color: #fff; }
@@ -39,11 +39,19 @@
       <span class="navbar-toggler-icon" style="filter:invert(1)"></span>
     </button>
     <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto gap-2">
+      <ul class="navbar-nav ms-auto gap-2 align-items-lg-center">
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
-        {% for cat in categories %}
+        {% for cat in categories if categories is defined %}
         <li class="nav-item"><a class="nav-link" href="{{ url_for('category', cat_id=cat.id) }}">{{ cat.name }}</a></li>
         {% endfor %}
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="{{ url_for('view_cart') }}">
+            <i class="bi bi-bag"></i> Cart
+            {% if session.get('cart') %}
+            <span class="badge rounded-pill" style="background:var(--saffron);font-size:.65rem;vertical-align:top">{{ session['cart'].values()|sum }}</span>
+            {% endif %}
+          </a>
+        </li>
       </ul>
     </div>
   </div>
@@ -53,7 +61,7 @@
   {% if messages %}
     <div class="container mt-2">
       {% for cat, msg in messages %}
-        <div class="alert alert-{{ cat }} alert-dismissible fade show py-2">
+        <div class="alert alert-{{ cat }} alert-dismissible fade show py-2" role="alert">
           {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
       {% endfor %}
@@ -68,7 +76,7 @@
     <div class="row">
       <div class="col-md-4 mb-4">
         <h6>✦ EthniCraft</h6>
-        <p style="font-size:.88rem">Celebrating traditional fashion. Handpicked ethnic wear for every occasion.</p>
+        <p style="font-size:.88rem">Celebrating the rich tapestry of traditional fashion. Handpicked ethnic wear for every occasion.</p>
       </div>
       <div class="col-md-2 mb-4">
         <h6>Shop</h6>
@@ -85,13 +93,13 @@
       <div class="col-md-3 mb-4">
         <h6>Follow Us</h6>
         <div class="d-flex gap-3 fs-4">
-          <a href="https://www.instagram.com/pachojaipur/?hl=en"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
           <a href="#"><i class="bi bi-facebook"></i></a>
           <a href="#"><i class="bi bi-pinterest"></i></a>
         </div>
       </div>
     </div>
-    <div class="footer-bottom">© 2026 EthniCraft. All rights reserved.</div>
+    <div class="footer-bottom">© 2024 EthniCraft. All rights reserved.</div>
   </div>
 </footer>
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -64,7 +64,46 @@ def product_detail(id):
     product = Product.query.get_or_404(id)
     related = Product.query.filter_by(category_id=product.category_id).filter(Product.id != id).limit(4).all()
     return render_template('product_detail.html', product=product, related=related)
+# ── Cart ─────────────────────────────────
+@app.route('/cart/add/<int:id>', methods=['POST'])
+def add_to_cart(id):
+    Product.query.get_or_404(id)
+    cart = session.get('cart', {})
+    cart[str(id)] = cart.get(str(id), 0) + 1
+    session['cart'] = cart
+    flash('Added to cart!', 'success')
+    return redirect(request.referrer or url_for('index'))
 
+@app.route('/cart')
+def view_cart():
+    cart = session.get('cart', {})
+    items = []
+    total = 0
+    for pid, qty in cart.items():
+        product = Product.query.get(int(pid))
+        if product:
+            items.append({'product': product, 'quantity': qty})
+            total += product.price * qty
+    return render_template('cart.html', items=items, total=total)
+
+@app.route('/cart/update/<int:id>', methods=['POST'])
+def update_cart(id):
+    qty = int(request.form.get('quantity', 1))
+    cart = session.get('cart', {})
+    if qty <= 0:
+        cart.pop(str(id), None)
+    else:
+        cart[str(id)] = qty
+    session['cart'] = cart
+    return redirect(url_for('view_cart'))
+
+@app.route('/cart/remove/<int:id>')
+def remove_from_cart(id):
+    cart = session.get('cart', {})
+    cart.pop(str(id), None)
+    session['cart'] = cart
+    flash('Item removed from cart.', 'info')
+    return redirect(url_for('view_cart'))
 # ── Admin Auth ───────────────────────────
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():

@@ -39,6 +39,12 @@ class Product(db.Model):
     price = db.Column(db.Float)
     description = db.Column(db.Text)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+class Customer(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -64,6 +70,42 @@ def product_detail(id):
     product = Product.query.get_or_404(id)
     related = Product.query.filter_by(category_id=product.category_id).filter(Product.id != id).limit(4).all()
     return render_template('product_detail.html', product=product, related=related)
+# ── Customer Auth ─────────────────────────
+@app.route('/customer/register', methods=['POST'])
+def customer_register():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    if Customer.query.filter_by(email=email).first():
+        flash('Email already registered. Please login.', 'warning')
+        return redirect(request.referrer or url_for('index'))
+    customer = Customer(name=name, email=email, password=generate_password_hash(password))
+    db.session.add(customer)
+    db.session.commit()
+    session['customer_id'] = customer.id
+    session['customer_name'] = customer.name
+    flash(f'Welcome, {customer.name}! Account created successfully.', 'success')
+    return redirect(request.form.get('next') or url_for('index'))
+
+@app.route('/customer/login', methods=['POST'])
+def customer_login():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    customer = Customer.query.filter_by(email=email).first()
+    if customer and check_password_hash(customer.password, password):
+        session['customer_id'] = customer.id
+        session['customer_name'] = customer.name
+        flash(f'Welcome back, {customer.name}!', 'success')
+        return redirect(request.form.get('next') or url_for('index'))
+    flash('Invalid email or password.', 'danger')
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/customer/logout')
+def customer_logout():
+    session.pop('customer_id', None)
+    session.pop('customer_name', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('index'))
 # ── Cart ─────────────────────────────────
 @app.route('/cart/add/<int:id>', methods=['POST'])
 def add_to_cart(id):

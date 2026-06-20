@@ -117,8 +117,8 @@
     <div class="row g-4">
       {% for product in recent_products %}
       <div class="col-6 col-md-4 col-lg-3">
+        <div class="prod-card h-100 d-flex flex-column">
         <a href="{{ url_for('product_detail', id=product.id) }}" class="text-decoration-none">
-        <div class="prod-card h-100">
           <div class="prod-img-wrap">
             {% if product.image %}
             <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" onerror="this.parentElement.innerHTML='<div class=prod-img-placeholder>👗</div>'">
@@ -136,8 +136,11 @@
             <span class="badge mt-2" style="background:var(--cream);color:var(--muted);border:1px solid #ddd;font-size:.75rem">{{ product.category.name }}</span>
             {% endif %}
           </div>
-        </div>
         </a>
+        <form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}" class="mt-auto px-3 pb-3">
+          <button type="submit" class="btn btn-sm w-100" style="background:#000;color:#fff;border:none;border-radius:6px;padding:.5rem;font-size:.85rem">Add to Cart</button>
+        </form>
+        </div>
       </div>
       {% else %}
       <div class="col-12 text-center py-5">

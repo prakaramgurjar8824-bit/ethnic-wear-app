@@ -57,7 +57,9 @@
         {% else %}
         <p class="detail-desc text-muted">No description available.</p>
         {% endif %}
-        <button class="btn-saffron-lg">Add to Cart</button>
+        <form method="POST" action="{{ url_for('add_to_cart', id=product.id) }}" class="d-inline">
+          <button type="submit" class="btn-saffron-lg">Add to Cart</button>
+        </form>
         <a href="{{ url_for('index') if not product.category else url_for('category', cat_id=product.category.id) }}" class="btn btn-outline-secondary ms-2 py-2">Back</a>
       </div>
     </div>

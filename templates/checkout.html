@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Checkout – EthniCraft{% endblock %}
+
+{% block extra_css %}
+<style>
+.checkout-section { background: var(--cream); min-height: 100vh; padding: 3rem 0; }
+.checkout-card { background: #fff; border-radius: 14px; border: 1px solid #eee; padding: 2rem; }
+.checkout-card h3 { font-family: 'Playfair Display', serif; color: var(--deep); font-size: 1.3rem; margin-bottom: 1.5rem; padding-bottom: .75rem; border-bottom: 2px solid var(--cream); }
+.form-label { font-size: .85rem; font-weight: 500; color: var(--deep); margin-bottom: .3rem; }
+.form-control { border: 1px solid #ddd; border-radius: 8px; padding: .65rem 1rem; font-size: .9rem; }
+.form-control:focus { border-color: var(--saffron); box-shadow: 0 0 0 .2rem rgba(212,96,26,.15); }
+.order-item { display: flex; justify-content: space-between; align-items: center; padding: .6rem 0; border-bottom: 1px solid #f0e8e0; font-size: .9rem; }
+.order-item:last-of-type { border-bottom: none; }
+.order-item .name { color: var(--deep); }
+.order-item .price { color: var(--saffron); font-weight: 600; }
+.order-total { display: flex; justify-content: space-between; padding: 1rem 0 0; margin-top: .5rem; border-top: 2px solid var(--cream); }
+.order-total .label { font-weight: 600; color: var(--deep); }
+.order-total .amount { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--saffron); font-weight: 700; }
+.card-icons { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.card-icons i { font-size: 1.8rem; }
+.btn-checkout { background: var(--saffron); color: #fff; border: none; width: 100%; padding: .85rem; border-radius: 10px; font-size: 1rem; font-weight: 500; letter-spacing: .5px; transition: background .2s; }
+.btn-checkout:hover { background: #b84e12; color: #fff; }
+.secure-badge { text-align: center; margin-top: .75rem; color: var(--muted); font-size: .8rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-section">
+  <div class="container">
+    <h2 class="mb-4" style="font-family:'Playfair Display',serif;color:var(--deep)">Checkout</h2>
+    <div class="row g-4">
+
+      <!-- LEFT: Billing + Payment -->
+      <div class="col-lg-7">
+        <form method="POST" action="/checkout/place-order">
+
+          <!-- Billing Address -->
+          <div class="checkout-card mb-4">
+            <h3><i class="bi bi-geo-alt me-2" style="color:var(--saffron)"></i>Billing Address</h3>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="fullname" placeholder="Prakaram Gurjar" required
+                  value="{{ session.get('customer_name', '') }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Phone</label>
+                <input type="tel" class="form-control" name="phone" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" name="address" placeholder="123, MG Road" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" name="city" placeholder="Jaipur" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" name="state" placeholder="Rajasthan" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">PIN Code</label>
+                <input type="text" class="form-control" name="pin" placeholder="302001" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Country</label>
+                <input type="text" class="form-control" name="country" value="India" required>
+              </div>
+            </div>
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" id="sameAddress" checked>
+              <label class="form-check-label" for="sameAddress" style="font-size:.85rem;color:var(--muted)">
+                Shipping address same as billing
+              </label>
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="checkout-card">
+            <h3><i class="bi bi-credit-card me-2" style="color:var(--saffron)"></i>Payment</h3>
+            <label class="form-label mb-2">Accepted Cards</label>
+            <div class="card-icons mb-3">
+              <i class="fa fa-cc-visa" style="color:navy"></i>
+              <i class="fa fa-cc-mastercard" style="color:red"></i>
+              <i class="fa fa-cc-amex" style="color:blue"></i>
+              <i class="fa fa-cc-discover" style="color:orange"></i>
+            </div>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Name on Card</label>
+                <input type="text" class="form-control" name="cardname" placeholder="Prakaram Gurjar" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Card Number</label>
+                <input type="text" class="form-control" name="cardnumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Expiry</label>
+                <input type="text" class="form-control" name="expiry" placeholder="MM / YY" maxlength="7" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">CVV</label>
+                <input type="text" class="form-control" name="cvv" placeholder="•••" maxlength="4" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-checkout mt-4">
+              <i class="bi bi-lock me-2"></i>Place Order
+            </button>
+            <div class="secure-badge">
+              <i class="bi bi-shield-check me-1"></i>Secured by 256-bit SSL encryption
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- RIGHT: Order Summary -->
+      <div class="col-lg-5">
+        <div class="checkout-card sticky-top" style="top:80px">
+          <h3><i class="bi bi-bag me-2" style="color:var(--saffron)"></i>Order Summary</h3>
+
+          {% if items %}
+            {% for item in items %}
+            <div class="order-item">
+              <span class="name">{{ item.product.name }} <span class="text-muted" style="font-size:.8rem">× {{ item.quantity }}</span></span>
+              <span class="price">₹{{ "%.0f"|format(item.product.price * item.quantity) }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted" style="font-size:.88rem">No items in cart.</p>
+          {% endif %}
+
+          <div class="order-item" style="border:none">
+            <span class="text-muted" style="font-size:.85rem">Shipping</span>
+            <span style="color:green;font-size:.85rem;font-weight:500">FREE</span>
+          </div>
+
+          <div class="order-total">
+            <span class="label">Total</span>
+            <span class="amount">₹{{ "%.0f"|format(total) }}</span>
+          </div>
+
+          <div class="mt-3 p-3 rounded" style="background:var(--cream);font-size:.82rem;color:var(--muted)">
+            <i class="bi bi-arrow-return-left me-1"></i> Easy 30-day returns &nbsp;|&nbsp;
+            <i class="bi bi-truck me-1"></i> Free delivery on all orders
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

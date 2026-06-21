@@ -146,6 +146,18 @@ def remove_from_cart(id):
     session['cart'] = cart
     flash('Item removed from cart.', 'info')
     return redirect(url_for('view_cart'))
+# ── Checkout ─────────────────────────────
+@app.route('/checkout')
+def checkout():
+    cart = session.get('cart', {})
+    items = []
+    total = 0
+    for pid, qty in cart.items():
+        product = Product.query.get(int(pid))
+        if product:
+            items.append({'product': product, 'quantity': qty})
+            total += product.price * qty
+    return render_template('checkout.html', items=items, total=total)
 # ── Admin Auth ───────────────────────────
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():

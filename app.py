@@ -290,6 +290,11 @@ def add_product():
         flash('Product added!', 'success')
         return redirect(url_for('admin_products'))
     return render_template('admin/product_form.html', product=None, categories=categories)
+# ── Customers ────────────────────────────
+@app.route('/admin/customers')
+@login_required
+def admin_customers():
+    return render_template('admin/customers.html', customers=Customer.query.order_by(Customer.id.desc()).all())
 
 @app.route('/admin/products/edit/<int:id>', methods=['GET', 'POST'])
 @login_required

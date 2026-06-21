@@ -47,7 +47,7 @@
         <span class="text-muted">Total</span>
         <span style="font-weight:700;color:var(--saffron);font-size:1.3rem">₹{{ "%.0f"|format(total) }}</span>
       </div>
-      <button class="btn-saffron w-100 py-2 rounded mt-2" style="border:none;color:#fff;font-weight:500">Proceed to Checkout</button>
+       <a href="{{ url_for('checkout') }}" class="btn-saffron w-100 py-2 rounded mt-2 d-block text-center text-decoration-none" style="color:#fff;font-weight:500">Proceed to Checkout</a>
       <a href="{{ url_for('index') }}" class="d-block text-center mt-3 text-muted" style="font-size:.88rem;text-decoration:none">Continue shopping</a>
     </div>
   </div>

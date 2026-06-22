@@ -14,8 +14,8 @@ app.config['UPLOAD_FOLDER'] = 'static/images'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'admin_login'
-RAZORPAY_KEY_ID = 'your_key_id_here'
-RAZORPAY_KEY_SECRET = 'your_key_secret_here'
+RAZORPAY_KEY_ID = 'rzp_test_T4ZHFQGgvTZriY'
+RAZORPAY_KEY_SECRET = 'pVKUozNQwyeT8sQ7ioeGmVX4'
 
 # ── Models ──────────────────────────────
 class Admin(UserMixin, db.Model):

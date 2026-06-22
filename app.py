@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
+import razorpay
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ethnicwear2024'
@@ -13,6 +14,8 @@ app.config['UPLOAD_FOLDER'] = 'static/images'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'admin_login'
+RAZORPAY_KEY_ID = 'your_key_id_here'
+RAZORPAY_KEY_SECRET = 'your_key_secret_here'
 
 # ── Models ──────────────────────────────
 class Admin(UserMixin, db.Model):
@@ -157,7 +160,21 @@ def checkout():
         if product:
             items.append({'product': product, 'quantity': qty})
             total += product.price * qty
-    return render_template('checkout.html', items=items, total=total)
+    client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+    order = client.order.create({
+        'amount': int(total * 100),
+        'currency': 'INR',
+        'payment_capture': 1
+    })
+    return render_template('checkout.html', items=items, total=total,
+                           razorpay_order_id=order['id'],
+                           razorpay_key_id=RAZORPAY_KEY_ID,
+                           amount=int(total * 100))
+@app.route('/payment/success', methods=['POST'])
+def payment_success():
+    session.pop('cart', None)
+    flash('Payment successful! Your order has been placed.', 'success')
+    return redirect(url_for('index'))
 # ── Admin Auth ───────────────────────────
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():

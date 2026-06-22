@@ -32,7 +32,7 @@
 
       <!-- LEFT: Billing + Payment -->
       <div class="col-lg-7">
-        <form method="POST" action="/checkout/place-order">
+        <form id="checkout-form">
 
           <!-- Billing Address -->
           <div class="checkout-card mb-4">
@@ -109,9 +109,42 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-checkout mt-4">
-              <i class="bi bi-lock me-2"></i>Place Order
-            </button>
+            <button type="button" id="rzp-button" class="btn-checkout mt-4">
+  <i class="bi bi-lock me-2"></i>Pay Now ₹{{ "%.0f"|format(total) }}
+</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    key: "{{ razorpay_key_id }}",
+    amount: "{{ amount }}",
+    currency: "INR",
+    name: "EthniCraft",
+    description: "Order Payment",
+    order_id: "{{ razorpay_order_id }}",
+    handler: function(response) {
+        fetch('/payment/success', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                payment_id: response.razorpay_payment_id,
+                order_id: response.razorpay_order_id,
+                signature: response.razorpay_signature
+            })
+        }).then(() => window.location.href = '/');
+    },
+    prefill: {
+        name: "{{ session.get('customer_name', '') }}",
+        email: ""
+    },
+    theme: { color: "#D4601A" }
+};
+var rzp = new Razorpay(options);
+document.getElementById('rzp-button').onclick = function(e) {
+    rzp.open();
+    e.preventDefault();
+}
+</script>
             <div class="secure-badge">
               <i class="bi bi-shield-check me-1"></i>Secured by 256-bit SSL encryption
             </div>

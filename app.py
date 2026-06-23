@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask import Flask, render_template, redirect, url_for, request, flash, session,jasonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -350,6 +350,31 @@ def create_admin():
             ))
             db.session.commit()
             print('Admin created: admin@ethnicwear.com / admin123')
+            
+
+@app.route('/api/search')
+def api_search():
+    query = request.args.get('q', '').strip()
+    
+    if not query:
+        return jsonify([])
+    
+    results = Product.query.filter(
+        or_(
+            Product.name.ilike(f'%{query}%'),
+            Product.description.ilike(f'%{query}%'),
+            Product.category.ilike(f'%{query}%')
+        )
+    ).limit(8).all()  # limit to 8 suggestions
+
+    return jsonify([{
+        'id': p.id,
+        'name': p.name,
+        'price': p.price,
+        'category': p.category,
+        'image': p.image_url  # whatever your image field is called
+    } for p in results])
+
 
 if __name__ == '__main__':
     create_admin()

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session,jasonify
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO, emit
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -7,6 +8,7 @@ import os
 import razorpay
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 app.config['SECRET_KEY'] = 'ethnicwear2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Prakaram.2407@localhost/ethnicwear'
 app.config['UPLOAD_FOLDER'] = 'static/images'
@@ -350,33 +352,7 @@ def create_admin():
             ))
             db.session.commit()
             print('Admin created: admin@ethnicwear.com / admin123')
-            
-
-@app.route('/api/search')
-def api_search():
-    query = request.args.get('q', '').strip()
-    
-    if not query:
-        return jsonify([])
-    
-    results = Product.query.filter(
-        or_(
-            Product.name.ilike(f'%{query}%'),
-            Product.description.ilike(f'%{query}%'),
-            Product.category.ilike(f'%{query}%')
-        )
-    ).limit(8).all()  # limit to 8 suggestions
-
-    return jsonify([{
-        'id': p.id,
-        'name': p.name,
-        'price': p.price,
-        'category': p.category,
-        'image': p.image_url  # whatever your image field is called
-    } for p in results])
-
 
 if __name__ == '__main__':
     create_admin()
-    app.run(debug=True)
- 
+    socketio.run(app, debug=True)

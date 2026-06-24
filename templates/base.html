@@ -27,6 +27,47 @@
     footer a { color: #b8a090; text-decoration: none; display: block; margin-bottom: .4rem; font-size: .88rem; }
     footer a:hover { color: var(--gold); }
     .footer-bottom { border-top: 1px solid #3a2a1a; margin-top: 2rem; padding-top: 1.2rem; font-size: .8rem; text-align: center; }
+  #chat-bubble { position: fixed; bottom: 28px; right: 28px; z-index: 9999; }
+  #chat-toggle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--saffron); border: none; color: #fff;
+    font-size: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    cursor: pointer; transition: transform .2s;
+  }
+  #chat-toggle:hover { transform: scale(1.1); }
+  #chat-box {
+    display: none; position: fixed; bottom: 96px; right: 28px;
+    width: 320px; background: #fff; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18); z-index: 9999;
+    flex-direction: column; overflow: hidden;
+  }
+  #chat-header {
+    background: var(--deep); color: var(--gold);
+    padding: .9rem 1.2rem; font-family: 'Playfair Display', serif;
+    font-size: 1rem; display: flex; justify-content: space-between; align-items: center;
+  }
+  #chat-messages {
+    height: 260px; overflow-y: auto; padding: 1rem;
+    display: flex; flex-direction: column; gap: .6rem; background: #fdf6ec;
+  }
+  .msg-bot, .msg-user {
+    max-width: 80%; padding: .55rem .85rem;
+    border-radius: 12px; font-size: .85rem; line-height: 1.5;
+  }
+  .msg-bot { background: #fff; border: 1px solid #e0d0b8; align-self: flex-start; color: var(--deep); }
+  .msg-user { background: var(--saffron); color: #fff; align-self: flex-end; }
+  #chat-input-area {
+    display: flex; border-top: 1px solid #eee; background: #fff;
+  }
+  #chat-input {
+    flex: 1; border: none; padding: .7rem 1rem;
+    font-size: .88rem; outline: none; background: transparent;
+  }
+  #chat-send {
+    border: none; background: var(--saffron); color: #fff;
+    padding: .7rem 1rem; cursor: pointer; font-size: 1rem;
+  }
+</style>
   </style>
   {% block extra_css %}{% endblock %}
 </head>
@@ -42,6 +83,7 @@
       <ul class="navbar-nav ms-auto gap-2 align-items-lg-center">
         <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
         {% for cat in categories if categories is defined %}
+
         <li class="nav-item"><a class="nav-link" href="{{ url_for('category', cat_id=cat.id) }}">{{ cat.name }}</a></li>
         {% endfor %}
         <li class="nav-item">
@@ -168,7 +210,61 @@
     </div>
   </div>
 </div>
+<!-- Chatbot Bubble -->
+<div id="chat-bubble">
+  <button id="chat-toggle" title="Chat with us">💬</button>
+</div>
 
+<div id="chat-box">
+  <div id="chat-header">
+    <span>✦ EthniCraft Assistant</span>
+    <span onclick="toggleChat()" style="cursor:pointer;font-size:1.1rem">✕</span>
+  </div>
+  <div id="chat-messages">
+    <div class="msg-bot">Namaste! 🙏 Ask me about our products, prices, or collections!</div>
+  </div>
+  <div id="chat-input-area">
+    <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off">
+    <button id="chat-send">➤</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  const chatBox = document.getElementById('chat-box');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
+
+  function toggleChat() {
+    chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+    chatBox.style.flexDirection = 'column';
+    if (chatBox.style.display === 'flex') chatInput.focus();
+  }
+
+  document.getElementById('chat-toggle').onclick = toggleChat;
+
+  function appendMsg(text, type) {
+    const div = document.createElement('div');
+    div.className = type === 'bot' ? 'msg-bot' : 'msg-user';
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+    appendMsg(msg, 'user');
+    socket.emit('user_message', { message: msg });
+    chatInput.value = '';
+  }
+
+  document.getElementById('chat-send').onclick = sendMessage;
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+  socket.on('bot_message', data => appendMsg(data.message, 'bot'));
+</script>
 <script>
 function switchTab(tab) {
   if (tab === 'login') {

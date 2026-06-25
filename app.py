@@ -8,7 +8,7 @@ import os
 import razorpay
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 app.config['SECRET_KEY'] = 'ethnicwear2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Prakaram.2407@localhost/ethnicwear'
 app.config['UPLOAD_FOLDER'] = 'static/images'
@@ -341,6 +341,65 @@ def delete_product(id):
     db.session.delete(Product.query.get_or_404(id))
     db.session.commit()
     return redirect(url_for('admin_products'))
+@socketio.on('user_message')
+def handle_message(data):
+    msg = data.get('message', '').strip().lower()
+    response = get_bot_reply(msg)
+    emit('bot_message', {'message': response})
+
+def get_bot_reply(msg):
+    # Greetings
+    if any(w in msg for w in ['hi', 'hello', 'hey', 'namaste']):
+        return "Namaste! 🙏 Welcome to EthniCraft. Ask me about our products, categories, or prices!"
+
+    # Categories
+    if any(w in msg for w in ['categor', 'collection', 'type', 'section']):
+        cats = Category.query.order_by(Category.order_num).all()
+        if cats:
+            names = ', '.join([c.name for c in cats])
+            return f"We have these collections: {names}. Which one interests you?"
+        return "We're adding collections soon. Stay tuned!"
+
+    # Price query
+    if any(w in msg for w in ['price', 'cost', 'rate', 'cheap', 'expensive', 'budget']):
+        cheapest = Product.query.order_by(Product.price.asc()).first()
+        priciest = Product.query.order_by(Product.price.desc()).first()
+        if cheapest and priciest:
+            return f"Our products range from ₹{int(cheapest.price)} to ₹{int(priciest.price)}. Something for every budget! 🛍️"
+        return "Please check our store for current pricing."
+
+    # Search by keyword
+    from sqlalchemy import or_
+    results = Product.query.filter(
+        or_(
+            Product.name.ilike(f'%{msg}%'),
+            Product.description.ilike(f'%{msg}%'),
+            Product.category.has(Category.name.ilike(f'%{msg}%'))
+        )
+    ).limit(3).all()
+    if results:
+        items = ', '.join([f"{p.name} (₹{int(p.price)})" for p in results])
+        return f"Here's what I found: {items}. Want more details?"
+
+    # Total products
+    if any(w in msg for w in ['how many', 'total', 'count', 'stock']):
+        count = Product.query.count()
+        return f"We currently have {count} products in our store!"
+
+    # Shipping / delivery
+    if any(w in msg for w in ['deliver', 'ship', 'dispatch']):
+        return "We offer FREE delivery on all orders! 🚚"
+
+    # Return policy
+    if any(w in msg for w in ['return', 'refund', 'exchange']):
+        return "We have an easy 30-day return policy. No questions asked! ✅"
+
+    # Contact
+    if any(w in msg for w in ['contact', 'support', 'help', 'phone', 'email']):
+        return "You can reach us at admin@ethnicwear.com. We're happy to help! 😊"
+
+    # Default
+    return "I'm not sure about that. Try asking about our products, prices, categories, or delivery! 🙏"
 
 # ── Create admin user ────────────────────
 def create_admin():
